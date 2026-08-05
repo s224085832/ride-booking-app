@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideBook - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="login-page">
+    <div id="login-card">
+      <h1>RideBook</h1>
+      <p class="instruction">Sign in to continue</p>
+      <form id="login-form">
+        <input type="text" id="username-input" placeholder="Username" autocomplete="username">
+        <input type="password" id="password-input" placeholder="Password" autocomplete="current-password">
+        <button type="submit" id="login-btn">Log In</button>
+      </form>
+      <p id="login-error" class="login-error"></p>
+      <div id="demo-accounts">
+        <p class="demo-title">Demo accounts</p>
+        <p>Rider: rider1 / rider123</p>
+        <p>Driver: driver1 / driver123</p>
+      </div>
+    </div>
+  </div>
+  <script src="login.js"></script>
+</body>
+</html>
