@@ -13,6 +13,9 @@ app.use(express.static('public'));
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
+console.log("MONGODB_URI exists:", !!process.env.MONGODB_URI);
+console.log("Length:", process.env.MONGODB_URI?.length); 
+
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Connection error:', err));
