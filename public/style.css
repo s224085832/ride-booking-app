@@ -397,10 +397,6 @@ button:active {
   gap: 10px;
 }
 
-#signup-form.hidden {
-  display: none;
-}
-
 #role-toggle {
   display: flex;
   gap: 8px;
@@ -448,10 +444,4 @@ button:active {
 
 #toggle-mode a:hover {
   text-decoration: underline;
-}
-
-#toggle-mode.hidden,
-#show-signup.hidden,
-#show-login.hidden {
-  display: none;
 }
