@@ -6,9 +6,7 @@
   <title>RideBook - Driver Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      overflow: auto;
-    }
+    body { overflow: auto; }
     #driver-dashboard {
       max-width: 600px;
       margin: 0 auto;
@@ -17,60 +15,55 @@
       min-height: 100vh;
       color: #ffffff;
     }
-    #driver-dashboard h1 {
-      color: #00d4aa;
-      margin-bottom: 5px;
-    }
-    #driver-dashboard p {
-      color: #aaaaaa;
-      margin-bottom: 20px;
-    }
-    .ride-card {
-      background: #16213e;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-    .ride-card .coords {
-      font-size: 0.85rem;
-      color: #cccccc;
-      margin-bottom: 10px;
-    }
-    .ride-card button {
-      margin-right: 8px;
-    }
-    .accept-btn {
-      background: #00d4aa;
-      color: #1a1a2e;
-    }
-    .complete-btn {
-      background: #6c63ff;
-      color: #ffffff;
-    }
-    .no-rides {
-      color: #666;
-      font-style: italic;
-    }
+    #driver-dashboard h1 { color: #00d4aa; margin-bottom: 5px; }
+    #driver-dashboard p { color: #aaaaaa; margin-bottom: 20px; }
+    .ride-card { background: #16213e; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+    .ride-card .coords { font-size: 0.85rem; color: #cccccc; margin-bottom: 10px; }
+    .ride-card button { margin-right: 8px; }
+    .accept-btn { background: #00d4aa; color: #1a1a2e; }
+    .complete-btn { background: #6c63ff; color: #ffffff; }
+    .no-rides { color: #666; font-style: italic; }
   </style>
 </head>
 <body>
   <div id="driver-dashboard">
-    <h1>Driver Dashboard</h1>
     <div id="user-bar">
       <span id="user-info"></span>
       <button id="logout-btn">Log out</button>
     </div>
-    <p>Pending rides will appear below. Accept or complete them.</p>
+    <h1>Driver Dashboard</h1>
 
-<div id="driver-profile">
-  <input type="text" id="driver-name-input" placeholder="Your name">
-  <input type="text" id="car-type-input" placeholder="Car type (e.g. Toyota Corolla)">
-  <button id="save-profile-btn">Save</button>
-  <p id="profile-status"></p>
-</div>
+    <div id="driver-profile">
+      <input type="text" id="driver-name-input" placeholder="Your name">
+      <input type="text" id="car-type-input" placeholder="Car type (e.g. Toyota Corolla)">
+      <button id="save-profile-btn">Save</button>
+      <p id="profile-status"></p>
+    </div>
 
-<div id="driver-rides"></div>
+    <div class="tabs">
+      <button id="tab-active" class="tab-btn active">Active</button>
+      <button id="tab-history" class="tab-btn">History</button>
+    </div>
+
+    <p id="driver-subtitle">Pending rides will appear below. Accept or complete them.</p>
+    <div id="driver-rides"></div>
   </div>
+
+  <!-- Chat modal -->
+  <div id="chat-modal" class="modal-overlay hidden">
+    <div class="modal-card chat-card">
+      <div class="chat-header">
+        <h2>Chat with rider</h2>
+        <button id="chat-close-btn" class="chat-close-btn">✕</button>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+        <button id="chat-send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
   <script src="driver.js"></script>
 </body>
 </html>
