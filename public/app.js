@@ -136,6 +136,24 @@ logoutBtn.addEventListener('click', function () {
   window.location.href = 'index.html';
 });
 
+// ----- Rider stats -----
+const riderStatsEl = document.createElement('div');
+riderStatsEl.id = 'rider-stats';
+riderStatsEl.className = 'stats-bar';
+document.querySelector('#sidebar h1').insertAdjacentElement('afterend', riderStatsEl);
+
+async function loadRiderStats() {
+  try {
+    const response = await fetch(`/api/stats?role=rider&name=${encodeURIComponent(currentUser.name)}`);
+    const stats = await response.json();
+    riderStatsEl.innerHTML = `<span>${stats.totalRides} ride${stats.totalRides === 1 ? '' : 's'} taken</span>`;
+  } catch (err) {
+    console.error('Error loading stats:', err);
+  }
+}
+
+loadRiderStats();
+
 historyToggleBtn.addEventListener('click', function () {
   bookingView.classList.add('hidden');
   historyPanel.classList.remove('hidden');
@@ -262,6 +280,23 @@ async function rateRide(id, stars) {
     console.error('Error submitting rating:', err);
   }
 }
+
+// Icons
+// ----- Click-to-set locations on the map -----
+map.on('click', async function (e) {
+  const fullAddress = await reverseGeocode(e.latlng.lat, e.latlng.lng);
+  const address = shortenAddress(fullAddress) || `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+  const location = { lat: e.latlng.lat, lng: e.latlng.lng, address };
+
+  if (!pickupLocation) {
+    pickupLocation = location;
+    pickupInput.value = address;
+  } else {
+    dropoffLocation = location;
+    dropoffInput.value = address;
+  }
+  debouncedUpdateDraft();
+});
 
 // Icons
 const greenIcon = L.icon({
@@ -586,7 +621,7 @@ function addRideToList(ride, listEl) {
     Dropoff: ${displayLocation(ride.dropoff)}<br>
     ${ride.fare != null ? `Fare: R${ride.fare.toFixed(2)}<br>` : ''}
     ${buildPaymentLine(ride)}
-    ${ride.driverName ? `<span class="driver-info">Driver: ${ride.driverName} (${ride.carType || 'car type not set'})</span><br>` : ''}
+        ${ride.driverName ? `<span class="driver-info">Driver: ${ride.driverName} (${ride.carType || 'car type not set'})${ride.carReg ? ' — ' + ride.carReg : ''}${ride.carColour ? ', ' + ride.carColour : ''}</span><br>` : ''}
     ${ride.status === 'cancelled' && ride.cancelReason ? `<span class="driver-info">Reason: ${ride.cancelReason}</span><br>` : ''}
     ${ratingHtml}
     <div class="ride-card-actions">
@@ -661,24 +696,26 @@ requestBtn.addEventListener('click', async function () {
     }
   }
 
-  const rideData = {
+    const rideData = {
     pickup: { lat: pickupLocation.lat, lng: pickupLocation.lng, address: pickupLocation.address },
     dropoff: { lat: dropoffLocation.lat, lng: dropoffLocation.lng, address: dropoffLocation.address },
     stops: stops.filter(s => s.location).map(s => ({
       lat: s.location.lat, lng: s.location.lng, address: s.location.address
     })),
     paymentMethod: selectedPaymentMethod,
-    cardLast4: selectedPaymentMethod === 'card' ? cardNumberInput.value.replace(/\D/g, '').slice(-4) : null
+    cardLast4: selectedPaymentMethod === 'card' ? cardNumberInput.value.replace(/\D/g, '').slice(-4) : null,
+    riderName: currentUser.name
   };
 
   try {
-    await fetch('/api/rides', {
+        await fetch('/api/rides', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(rideData)
     });
     resetMarkers();
     loadRides();
+    loadRiderStats();
   } catch (err) {
     console.error('Error requesting ride:', err);
   }

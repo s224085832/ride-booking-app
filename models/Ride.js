@@ -42,11 +42,23 @@ const rideSchema = new mongoose.Schema({
     enum: ['pending', 'paid'],
     default: 'pending'
   },
+  riderName: {
+    type: String,
+    default: null
+  },
   driverName: {
     type: String,
     default: null
   },
   carType: {
+    type: String,
+    default: null
+  },
+  carReg: {
+    type: String,
+    default: null
+  },
+  carColour: {
     type: String,
     default: null
   },

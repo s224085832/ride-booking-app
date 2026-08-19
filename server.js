@@ -19,7 +19,6 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Connection error:', err));
 
-// Distance between two coordinates in km, using the Haversine formula
 function getDistanceKm(pickup, dropoff) {
   const R = 6371;
   const dLat = (dropoff.lat - pickup.lat) * Math.PI / 180;
@@ -32,8 +31,6 @@ function getDistanceKm(pickup, dropoff) {
   return R * c;
 }
 
-// Get the real driving distance for a route from OSRM (free, no API key).
-// Falls back to straight-line distance if OSRM is unreachable.
 async function getRoadDistanceKm(points) {
   const coordsParam = points.map(p => `${p.lng},${p.lat}`).join(';');
   try {
@@ -55,7 +52,6 @@ async function getRoadDistanceKm(points) {
   }
 }
 
-// Fare in South African Rand: base fare + per-km rate, using real road distance
 async function calculateFare(pickup, stops, dropoff) {
   const BASE_FARE = 15;
   const PER_KM_RATE = 8;
@@ -66,7 +62,7 @@ async function calculateFare(pickup, stops, dropoff) {
 
 app.post('/api/rides', async (req, res) => {
   try {
-    const { pickup, dropoff, stops, paymentMethod, cardLast4 } = req.body;
+    const { pickup, dropoff, stops, paymentMethod, cardLast4, riderName } = req.body;
     const fare = await calculateFare(pickup, stops, dropoff);
     const ride = new Ride({
       pickup,
@@ -74,7 +70,8 @@ app.post('/api/rides', async (req, res) => {
       stops: stops || [],
       fare,
       paymentMethod: paymentMethod === 'card' ? 'card' : 'cash',
-      cardLast4: paymentMethod === 'card' ? cardLast4 : null
+      cardLast4: paymentMethod === 'card' ? cardLast4 : null,
+      riderName: riderName || null
     });
     const savedRide = await ride.save();
     res.status(201).json(savedRide);
@@ -94,15 +91,16 @@ app.get('/api/rides', async (req, res) => {
 
 app.patch('/api/rides/:id', async (req, res) => {
   try {
-    const { status, driverName, carType, cancelReason, rating } = req.body;
+    const { status, driverName, carType, carReg, carColour, cancelReason, rating } = req.body;
     const update = {};
     if (status) update.status = status;
     if (driverName) update.driverName = driverName;
     if (carType) update.carType = carType;
+    if (carReg) update.carReg = carReg;
+    if (carColour) update.carColour = carColour;
     if (cancelReason) update.cancelReason = cancelReason;
     if (rating) update.rating = rating;
 
-    // Simulate payment settling the moment a ride is marked completed
     if (status === 'completed') {
       update.paymentStatus = 'paid';
     }
@@ -121,7 +119,34 @@ app.patch('/api/rides/:id', async (req, res) => {
   }
 });
 
-// ----- Chat messages for a specific ride -----
+// ----- Account stats: rides taken (rider) or completed + rating (driver) -----
+app.get('/api/stats', async (req, res) => {
+  try {
+    const { role, name } = req.query;
+    if (!role || !name) {
+      return res.status(400).json({ error: 'role and name are required' });
+    }
+
+    if (role === 'rider') {
+      const totalRides = await Ride.countDocuments({ riderName: name, status: 'completed' });
+      return res.json({ totalRides });
+    }
+
+    if (role === 'driver') {
+      const totalRides = await Ride.countDocuments({ driverName: name, status: 'completed' });
+      const ratedRides = await Ride.find({ driverName: name, rating: { $ne: null } }).select('rating');
+      const avgRating = ratedRides.length
+        ? Math.round((ratedRides.reduce((sum, r) => sum + r.rating, 0) / ratedRides.length) * 10) / 10
+        : null;
+      return res.json({ totalRides, avgRating, ratedCount: ratedRides.length });
+    }
+
+    res.status(400).json({ error: 'role must be rider or driver' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/rides/:id/messages', async (req, res) => {
   try {
     const ride = await Ride.findById(req.params.id);
@@ -148,7 +173,6 @@ app.post('/api/rides/:id/messages', async (req, res) => {
   }
 });
 
-// Address search proxy, restricted to South Africa
 app.get('/api/geocode', async (req, res) => {
   try {
     const query = (req.query.q || '').trim();

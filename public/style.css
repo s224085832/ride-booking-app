@@ -890,3 +890,43 @@ button:active {
   color: var(--text-muted);
   line-height: 1.4;
 }
+.stats-bar {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 6px 0 14px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+
+#driver-profile input {
+  min-width: 130px;
+}
+
+#pickup-map-section {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+#pickup-map-section h2 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+#pickup-map {
+  height: 200px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+#pickup-distance {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
